@@ -69,12 +69,12 @@ session.add(category6)
 session.commit()
 
 # Lego Ninjago category
-category7 = Category(user_id=1, name="LEGO Ninjago", age_range="Ages 6+")
+category7 = Category(user_id=1, name="LEGO Ninjago", age_range="Ages 8+")
 session.add(category7)
 session.commit()
 
 # Lego City category
-category8 = Category(user_id=1, name="LEGO City", age_range="Ages 6+")
+category8 = Category(user_id=1, name="LEGO City", age_range="Ages 5+")
 session.add(category8)
 session.commit()
 
