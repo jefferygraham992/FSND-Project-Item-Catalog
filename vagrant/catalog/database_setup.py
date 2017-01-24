@@ -29,13 +29,15 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
+    age_range = Column(String(15))
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
             'name': self.name,
-            'id': self.id
+            'id': self.id,
+            'age_range': self.age_range
         }
 
 
