@@ -28,6 +28,7 @@ class Category(Base):
     __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
     name = Column(String(250), nullable=False)
     age_range = Column(String(15))
 
@@ -68,7 +69,7 @@ class LegoSet(Base):
         }
 
 
-engine = create_engine('sqlite:///catalogitemswithusers.db')
+engine = create_engine('sqlite:///catalogitems.db')
 
 
 Base.metadata.create_all(engine)
