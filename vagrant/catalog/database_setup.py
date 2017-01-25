@@ -48,7 +48,7 @@ class LegoSet(Base):
     set_name = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
     pieces = Column(Integer)
-    lot_id = Column(Integer)
+    set_id = Column(Integer)
     description = Column(String(250))
     set_picture = Column(String(250))
     categoryName = Column(String(250), ForeignKey('category.category_name'))
