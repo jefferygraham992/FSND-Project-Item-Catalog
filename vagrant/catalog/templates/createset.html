@@ -1,24 +1,54 @@
-{% for category in categories %}
- {#    <a href = "{{url_for('showMenu', restaurant_id = restaurant.id)}}">
-      <div class="row">
-        <div class="col-md-1"></div>
-          <div class="col-md-10 restaurant-list"> #}
-            <h3>{{category.name}}</h3>
-{#           </div>
-        <div class="col-md-1"></div>
-      </div>
-    </a> #}
-  {% endfor %}
+{% extends "main.html" %}
+{% include "header.html" %}
 
-  {% for latest_item in latest_items %}
- {#    <a href = "{{url_for('showMenu', restaurant_id = restaurant.id)}}">
-      <div class="row">
-        <div class="col-md-1"></div>
-          <div class="col-md-10 restaurant-list"> #}
-            <h3>{{latest_item.name}}</h3>
-{#           </div>
-        <div class="col-md-1"></div>
-      </div>
-    </a> #}
-  {% endfor %}
+{% block content %}
+<p>Create a new set</p>
+  <form method="post">
+    <div>
+      <label>Name:
+        <input type="text" name="set_name" placeholder="Name of the set">
+      </label>
+    </div>
+
+    <div>
+      <label>Pieces:
+        <input type="text" name="pieces" placeholder="Number of pieces">
+      </label>
+    </div>
+
+    <div>
+      <label>Set Number:
+        <input type="text" name="set_id" placeholder="Set Identification Number">
+      </label>
+    </div>
+
+    <div>
+      <label>Description:
+        <textarea name="description" placeholder="Description of the set"></textarea>
+      </label>
+    </div>
+
+    <div>
+      <label>Upload Picture:
+        <input type="file" name="set_picture" size="40">
+      </label>
+    </div>
+
+    <div>
+      <label>Category:
+        <select name="category_name">
+          {% for category in categories %}
+            {% if category.category_name == selectedCategory %}
+              <option value="{{category.category_name}}" selected>{{category.category_name}}</option>
+            {% else %}
+              <option value="{{category.category_name}}">{{category.category_name}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <input type="Submit" value="Create">
+    <a href="#">Cancel</a>
+  </form>
+{% endblock %}
 

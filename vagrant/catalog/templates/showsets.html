@@ -1,7 +1,13 @@
-<h3>{{category.category_name}}</h3>
+{% extends "main.html" %}
+{% include "header.html" %}
 
-{% for set in lego_set %}
-  <h3>{{set.set_name}}</h3>
-{% endfor %}
+{% block content %}
+  <a href="{{url_for('createSet', category_name = category.category_name)}}">Create new set</a>
+  <h3>{{category.category_name}}</h3>
+
+  {% for set in lego_set %}
+    <a href="{{url_for('showSet', category_name = set.categoryName, set_name = set.set_name)}}"><h3>{{set.set_name}}</h3></a>
+  {% endfor %}
+{% endblock %}
 
 
