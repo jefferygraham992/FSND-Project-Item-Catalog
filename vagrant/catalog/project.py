@@ -24,19 +24,18 @@ session = DBSession()
 
 @app.route('/')
 @app.route('/catalog/')
-def showCatgories():
-    # categories = session.query(Category).order_by(asc(Category.name))
-    # latest_items = session.query(LegoSet)
-    # # if 'username' not in login_session:
-    # #     return render_template('publicrestaurants.html', restaurants=restaurants)
-    # return render_template('categories.html', categories=categories, latest_items=latest_items)
-    return "List categories & latest items"
+def showCategories():
+    categories = session.query(Category).order_by(asc(Category.name))
+    latest_items = session.query(LegoSet)
+    return render_template('showcategories.html', categories=categories, latest_items=latest_items)
 
 
 @app.route('/catalog/<category_name>/')
 @app.route('/catalog/<category_name>/sets/')
 def showSets(category_name):
-    return "All the sets for a specific category"
+    category = session.query(Category).filter_by(category_name=category_name).one()
+    lego_set = session.query(LegoSet).filter_by(categoryName=category_name).all()
+    return render_template('showsets.html', category=category, lego_set=lego_set)
 
 
 @app.route('/catalog/<category_name>/<lego_set_name>/')

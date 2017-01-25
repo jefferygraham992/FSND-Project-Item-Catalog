@@ -10,17 +10,17 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    user_name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
-    picture = Column(String(250))
+    user_picture = Column(String(250))
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
+            'user_name': self.user_name,
             'id': self.id,
-            'picture': self.picture
+            'user_picture': self.user_picture
         }
 
 
@@ -29,14 +29,14 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    name = Column(String(250), nullable=False)
+    category_name = Column(String(250), nullable=False)
     age_range = Column(String(15))
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
+            'category_name': self.category_name,
             'id': self.id,
             'age_range': self.age_range
         }
@@ -45,13 +45,13 @@ class Category(Base):
 class LegoSet(Base):
     __tablename__ = 'lego_set'
 
-    name = Column(String(80), nullable=False)
+    set_name = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
     pieces = Column(Integer)
     lot_id = Column(Integer)
     description = Column(String(250))
-    picture = Column(String(250))
-    category_id = Column(Integer, ForeignKey('category.id'))
+    set_picture = Column(String(250))
+    categoryName = Column(String(250), ForeignKey('category.category_name'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
@@ -60,12 +60,12 @@ class LegoSet(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'name': self.name,
+            'set_name': self.set_name,
             'description': self.description,
             'id': self.id,
             'pieces': self.pieces,
             'lot_id': self.lot_id,
-            'picture': self.picture
+            'set_picture': self.set_picture
         }
 
 
