@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database_setup import Category, Base, LegoSet, User
 
-engine = create_engine('sqlite:///catalogitems.db')
+engine = create_engine('sqlite:///itemcatalog.db')
 # Bind the engine to the metadata of the Base class so that the
 # declaratives can be accessed through a DBSession instance
 Base.metadata.bind = engine
@@ -29,7 +29,7 @@ session.commit()
 
 # Create dummy user
 User1 = User(user_name="Robo Barista", email="tinnyTim@udacity.com",
-             user_picture='https://pbs.twimg.com/profile_images/2671170543/18debd694829ed78203a5a36dd364160_400x400.png')
+             picture='https://pbs.twimg.com/profile_images/2671170543/18debd694829ed78203a5a36dd364160_400x400.png')
 session.add(User1)
 session.commit()
 
@@ -38,7 +38,7 @@ category1 = Category(user_id=1, category_name="LEGO Minecraft", age_range="Ages 
 session.add(category1)
 session.commit()
 
-legoSet1 = LegoSet(user_id=1, set_name="The Village", set_picture="#", set_id=21128, pieces=1600, description="Join forces with Alex at the busy Minecraft village, including a variety of biomes plus a watchtower, library, blacksmith, butcher and marketplace. Enjoy hands-on Minecraft adventures featuring your favorite characters and objects with this LEGO Minecraft set-designed for young fans of the highly successful sandbox video game", category=category1)
+legoSet1 = LegoSet(user_id=1, set_name="The Village", set_id=21128, pieces=1600, description="Join forces with Alex at the busy Minecraft village, including a variety of biomes plus a watchtower, library, blacksmith, butcher and marketplace. Enjoy hands-on Minecraft adventures featuring your favorite characters and objects with this LEGO Minecraft set-designed for young fans of the highly successful sandbox video game", category=category1)
 
 session.add(legoSet1)
 session.commit()

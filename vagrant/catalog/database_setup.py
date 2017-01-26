@@ -12,15 +12,15 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     user_name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
-    user_picture = Column(String(250))
+    picture = Column(String(250))
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'user_name': self.user_name,
             'id': self.id,
-            'user_picture': self.user_picture
+            'user_name': self.user_name,
+            'picture': self.picture
         }
 
 
@@ -36,8 +36,8 @@ class Category(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'category_name': self.category_name,
             'id': self.id,
+            'category_name': self.category_name,
             'age_range': self.age_range
         }
 
@@ -50,7 +50,6 @@ class LegoSet(Base):
     pieces = Column(Integer)
     set_id = Column(Integer)
     description = Column(String(250))
-    set_picture = Column(String(250))
     categoryName = Column(String(250), ForeignKey('category.category_name'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -60,16 +59,16 @@ class LegoSet(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
-            'set_name': self.set_name,
-            'description': self.description,
             'id': self.id,
+            'set_name': self.set_name,
             'pieces': self.pieces,
-            'lot_id': self.lot_id,
-            'set_picture': self.set_picture
+            'set_id': self.set_id,
+            'description': self.description,
+            'categoryName': self.categoryName
         }
 
 
-engine = create_engine('sqlite:///catalogitems.db')
+engine = create_engine('sqlite:///itemcatalog.db')
 
 
 Base.metadata.create_all(engine)

@@ -5,8 +5,8 @@
   <a href="{{url_for('createSet', category_name = category.category_name)}}">Create new set</a>
   <h3>{{category.category_name}}</h3>
 
-  {% for set in lego_set %}
-    <a href="{{url_for('showSet', category_name = set.categoryName, set_name = set.set_name)}}"><h3>{{set.set_name}}</h3></a>
+  {% for lego_set in lego_sets %}
+    <a href="{{url_for('showSet', category_name = lego_set.categoryName, set_name = lego_set.set_name)}}"><h3>{{lego_set.set_name}}</h3></a>
   {% endfor %}
 {% endblock %}
 

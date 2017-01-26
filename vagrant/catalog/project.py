@@ -15,11 +15,32 @@ import requests
 app = Flask(__name__)
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///catalogitems.db')
+engine = create_engine('sqlite:///itemcatalog.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+# JSON APIs
+@app.route('/catalog/JSON')
+def catalogJSON():
+    categories = session.query(Category).all()
+    return jsonify(categories=[category.serialize for category in categories])
+
+
+@app.route('/catalog/<category_name>/JSON')
+@app.route('/catalog/<category_name>/sets/JSON')
+def showSetsJSON(category_name):
+    category = session.query(Category).filter_by(category_name=category_name).one()
+    lego_sets = session.query(LegoSet).filter_by(categoryName=category_name).all()
+    return jsonify(LegoSet=[lego_set.serialize for lego_set in lego_sets])
+
+
+@app.route('/catalog/<category_name>/<set_name>/JSON')
+def showSetJSON(category_name, set_name):
+    lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
+    return jsonify(lego_set=lego_set.serialize)
 
 
 # show all Lego set categories
@@ -36,8 +57,8 @@ def showCategories():
 @app.route('/catalog/<category_name>/sets/')
 def showSets(category_name):
     category = session.query(Category).filter_by(category_name=category_name).one()
-    lego_set = session.query(LegoSet).filter_by(categoryName=category_name).all()
-    return render_template('showsets.html', category=category, lego_set=lego_set)
+    lego_sets = session.query(LegoSet).filter_by(categoryName=category_name).all()
+    return render_template('showsets.html', category=category, lego_sets=lego_sets)
 
 
 # show information for a particular Lego set
@@ -71,7 +92,6 @@ def createSet(category_name):
 @app.route('/catalog/<category_name>/<set_name>/edit/', methods=['GET', 'POST'])
 def editSet(category_name, set_name):
     editedSet = session.query(LegoSet).filter_by(set_name=set_name).one()
-    category = session.query(Category).filter_by(category_name=category_name).one()
     categories = session.query(Category).all()
     if request.method == 'POST':
         if request.form['set_name']:
@@ -82,8 +102,6 @@ def editSet(category_name, set_name):
             editedSet.set_id = request.form['set_id']
         if request.form['pieces']:
             editedSet.pieces = request.form['pieces']
-        if request.form['set_picture']:
-            editedSet.set_picture = request.form['set_picture']
         if request.form['categoryName']:
             editedSet.categoryName = request.form['categoryName']
         session.add(editedSet)
