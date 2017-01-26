@@ -2,7 +2,9 @@
 {% include "header.html" %}
 
 {% block content %}
-  <p>Are you sure you want to delete {{lego_set.set_name}}?</p>
-  <input type="Submit" value="Delete">
-  <a href="{{url_for('showCategories')}}">Cancel</a>
+  <h2>Are you sure you want to delete {{lego_set.set_name}}?</h2>
+  <form action="#" method="post">
+    <input type="Submit" value="Delete">
+    <a href="{{url_for('showCategories')}}">Cancel</a>
+  </form>
 {% endblock %}

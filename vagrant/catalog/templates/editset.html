@@ -4,7 +4,7 @@
 {% block content %}
   <h3>Edit {{lego_set.set_name}}</h3>
 
-  <form method="post">
+  <form action="#" method="post">
     <div>
       <label>Name:
         <input type="text" name="set_name" placeholder="{{lego_set.set_name}}">
@@ -37,7 +37,7 @@
 
     <div>
       <label>Category:
-        <select name="category_name">
+        <select name="categoryName">
           {% for category in categories %}
             {% if category.category_name == lego_set.categoryName%}
               <option value="{{category.category_name}}" selected>{{category.category_name}}</option>
@@ -49,7 +49,7 @@
       </label>
     </div>
 
-    <input type="Submit" value="Delete">
+    <input type="Submit" value="Edit">
     <a href="#">Cancel</a>
   </form>
 {% endblock %}

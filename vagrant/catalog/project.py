@@ -48,26 +48,62 @@ def showSet(category_name, set_name):
 
 
 # Create a new Lego set
-@app.route('/catalog/<category_name>/sets/new')
+@app.route('/catalog/<category_name>/sets/new', methods=['GET', 'POST'])
 def createSet(category_name):
     categories = session.query(Category).all()
     selectedCategory = category_name
-    return render_template('createset.html', categories=categories, selectedCategory=selectedCategory)
+    category = session.query(Category).filter_by(category_name=category_name).one()
+    if request.method == 'POST':
+        newSet = LegoSet(set_name=request.form['set_name'],
+                                    pieces=request.form['pieces'],
+                                    set_id=request.form['set_id'],
+                                    description=request.form['description'],
+                                    set_picture=request.form['set_picture'],
+                                    categoryName=request.form['category_name'])
+        session.add(newSet)
+        session.commit()
+        return redirect(url_for('showSets', category_name=category_name))
+    else:
+        return render_template('createset.html', categories=categories, selectedCategory=selectedCategory)
 
 
 # Edit a Lego set
-@app.route('/catalog/<category_name>/<set_name>/edit/')
+@app.route('/catalog/<category_name>/<set_name>/edit/', methods=['GET', 'POST'])
 def editSet(category_name, set_name):
-    lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
+    editedSet = session.query(LegoSet).filter_by(set_name=set_name).one()
+    category = session.query(Category).filter_by(category_name=category_name).one()
     categories = session.query(Category).all()
-    return render_template('editset.html', lego_set=lego_set, categories=categories)
+    if request.method == 'POST':
+        if request.form['set_name']:
+            editedSet.set_name = request.form['set_name']
+        if request.form['description']:
+            editedSet.description = request.form['description']
+        if request.form['set_id']:
+            editedSet.set_id = request.form['set_id']
+        if request.form['pieces']:
+            editedSet.pieces = request.form['pieces']
+        if request.form['set_picture']:
+            editedSet.set_picture = request.form['set_picture']
+        if request.form['categoryName']:
+            editedSet.categoryName = request.form['categoryName']
+        session.add(editedSet)
+        session.commit()
+        return redirect(url_for('showSets', category_name=category_name))
+    else:
+        return render_template('editset.html', lego_set=editedSet, categories=categories)
 
 
 # Delete a Lego set
-@app.route('/catalog/<category_name>/<set_name>/delete/')
+@app.route('/catalog/<category_name>/<set_name>/delete/', methods=['GET', 'POST'])
 def deleteSet(category_name, set_name):
     lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
-    return render_template('deleteset.html', lego_set=lego_set)
+    setToDelete = session.query(LegoSet).filter_by(set_name=set_name).one()
+    if request.method == 'POST':
+        session.delete(setToDelete)
+        session.commit()
+        return redirect(url_for('showSets', category_name=category_name))
+    else:
+        return render_template('deleteset.html', lego_set=lego_set)
 
 
 if __name__ == '__main__':
