@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% include "header.html" %}
+
+{% block content %}
+<h1>Edit {{editedTrain.character_name}}</h1>
+<form action="#" method="post">
+  <label for="name">Name:</label>
+  <input type="text" name="character_name" placeholder="{{editedTrain.character_name}}">
+
+  <label for="description">Description:</label>
+  <textarea name="description" placeholder="{{editedTrain.description}}"></textarea>
+
+  <label for="Category">Category:</label>
+  <select name="character_kind">
+    {% for train_kind in inventory %}
+      {% if editedTrain %}
+        <option value="{{editedTrain.character_kind}}" selected>{{editedTrain.character_kind}}</option>>
+      {% else %}
+        <option value="{{train_kind.type_name}}">{{train_kind.type_name}}</option>>
+      {% endif %}
+    {% endfor %}
+  </select>
+  <input type="Submit" value="Submit">
+</form>
+{% endblock %}

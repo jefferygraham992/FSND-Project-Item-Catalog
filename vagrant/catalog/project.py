@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, LegoSet, User
+from database_setup import Base, CharacterType, Character, User
 from flask import session as login_session
 import random
 import string
@@ -15,113 +15,102 @@ import requests
 app = Flask(__name__)
 
 # Connect to Database and create database session
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('sqlite:///thomascatalog.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-# JSON APIs
+# JSON APIS
 @app.route('/catalog/JSON')
 def catalogJSON():
-    categories = session.query(Category).all()
-    return jsonify(categories=[category.serialize for category in categories])
+    inventory = session.query(CharacterType).all()
+    return jsonify(inventory=[train_kind.serialize for train_kind in inventory])
 
 
-@app.route('/catalog/<category_name>/JSON')
-@app.route('/catalog/<category_name>/sets/JSON')
-def showSetsJSON(category_name):
-    category = session.query(Category).filter_by(category_name=category_name).one()
-    lego_sets = session.query(LegoSet).filter_by(categoryName=category_name).all()
-    return jsonify(LegoSet=[lego_set.serialize for lego_set in lego_sets])
+@app.route('/catalog/<train_type>/JSON')
+def trainsJSON(train_type):
+    trains = session.query(Character).filter_by(character_kind=train_type).all()
+    return jsonify(engines=[train.serialize for train in trains])
 
 
-@app.route('/catalog/<category_name>/<set_name>/JSON')
-def showSetJSON(category_name, set_name):
-    lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
-    return jsonify(lego_set=lego_set.serialize)
+@app.route('/catalog/<train_type>/<train_name>/JSON')
+def trainJSON(train_type, train_name):
+    train = session.query(Character).filter_by(character_name=train_name).one()
+    return jsonify(train=train.serialize)
 
 
-# show all Lego set categories
+# show all train categories & latest trains
 @app.route('/')
-@app.route('/catalog/')
-def showCategories():
-    categories = session.query(Category).order_by(asc(Category.category_name))
-    latest_items = session.query(LegoSet)
-    return render_template('showcategories.html', categories=categories, latest_items=latest_items)
+@app.route('/catalog')
+def showCatalog():
+    inventory = session.query(CharacterType).order_by(asc(CharacterType.id))
+    latest_trains = session.query(Character).limit(10)
+    return render_template('showcatalog.html', inventory=inventory, latest_trains=latest_trains)
 
 
-# show all Lego set for a particular category
-@app.route('/catalog/<category_name>/')
-@app.route('/catalog/<category_name>/sets/')
-def showSets(category_name):
-    category = session.query(Category).filter_by(category_name=category_name).one()
-    lego_sets = session.query(LegoSet).filter_by(categoryName=category_name).all()
-    return render_template('showsets.html', category=category, lego_sets=lego_sets)
+# show all trains in one category
+@app.route('/catalog/<train_type>')
+@app.route('/catalog/<train_type>/trains')
+def showTrains(train_type):
+    trainType = session.query(CharacterType).filter_by(type_name=train_type).one()
+    trains = session.query(Character).filter_by(character_kind=train_type).all()
+    return render_template('showtrains.html', trainType=trainType, trains=trains)
 
 
-# show information for a particular Lego set
-@app.route('/catalog/<category_name>/<set_name>/')
-def showSet(category_name, set_name):
-    lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
-    return render_template('showset.html', lego_set=lego_set)
+# show info for one train
+@app.route('/catalog/<train_type>/<train_name>')
+def showTrain(train_type, train_name):
+    train = session.query(Character).filter_by(character_name=train_name).one()
+    return render_template('showtrain.html', train=train)
 
 
-# Create a new Lego set
-@app.route('/catalog/<category_name>/sets/new', methods=['GET', 'POST'])
-def createSet(category_name):
-    categories = session.query(Category).all()
-    selectedCategory = category_name
-    category = session.query(Category).filter_by(category_name=category_name).one()
+# add a train
+@app.route('/catalog/add', methods=['GET', 'POST'])
+def addTrain():
+    inventory = session.query(CharacterType).all()
     if request.method == 'POST':
-        newSet = LegoSet(set_name=request.form['set_name'],
-                                    pieces=request.form['pieces'],
-                                    set_id=request.form['set_id'],
-                                    description=request.form['description'],
-                                    set_picture=request.form['set_picture'],
-                                    categoryName=request.form['category_name'])
-        session.add(newSet)
+        newTrain = Character(character_name=request.form['character_name'], description=request.form['description'], character_kind=request.form['character_kind'])
+        session.add(newTrain)
+        flash('%s successfully added!' % newTrain.character_name)
         session.commit()
-        return redirect(url_for('showSets', category_name=category_name))
+        return redirect(url_for('showCatalog'))
     else:
-        return render_template('createset.html', categories=categories, selectedCategory=selectedCategory)
+        return render_template('newtrain.html', inventory=inventory)
 
 
-# Edit a Lego set
-@app.route('/catalog/<category_name>/<set_name>/edit/', methods=['GET', 'POST'])
-def editSet(category_name, set_name):
-    editedSet = session.query(LegoSet).filter_by(set_name=set_name).one()
-    categories = session.query(Category).all()
+# edit a train
+@app.route('/catalog/<train_name>/edit', methods=['GET', 'POST'])
+def editTrain(train_name):
+    inventory = session.query(CharacterType).all()
+    editedTrain = session.query(Character).filter_by(character_name=train_name).one()
     if request.method == 'POST':
-        if request.form['set_name']:
-            editedSet.set_name = request.form['set_name']
+        if request.form['character_name']:
+            editedTrain.character_name = request.form['character_name']
         if request.form['description']:
-            editedSet.description = request.form['description']
-        if request.form['set_id']:
-            editedSet.set_id = request.form['set_id']
-        if request.form['pieces']:
-            editedSet.pieces = request.form['pieces']
-        if request.form['categoryName']:
-            editedSet.categoryName = request.form['categoryName']
-        session.add(editedSet)
+            editedTrain.description = request.form['description']
+        if request.form['character_kind']:
+            editedTrain.character_kind = request.form['character_kind']
+        session.add(editedTrain)
+        flash('%s edited successfully!' % editedTrain.character_name)
         session.commit()
-        return redirect(url_for('showSets', category_name=category_name))
+        return redirect(url_for('showCatalog'))
     else:
-        return render_template('editset.html', lego_set=editedSet, categories=categories)
+        return render_template('edittrain.html', editedTrain=editedTrain, inventory=inventory)
 
 
-# Delete a Lego set
-@app.route('/catalog/<category_name>/<set_name>/delete/', methods=['GET', 'POST'])
-def deleteSet(category_name, set_name):
-    lego_set = session.query(LegoSet).filter_by(set_name=set_name).one()
-    setToDelete = session.query(LegoSet).filter_by(set_name=set_name).one()
+# delete a train
+@app.route('/catalog/<train_name>/delete', methods=['GET', 'POST'])
+def deleteTrain(train_name):
+    trainToDelete = session.query(Character).filter_by(character_name=train_name).one()
     if request.method == 'POST':
-        session.delete(setToDelete)
+        session.delete(trainToDelete)
+        flash('%s successfuly deleted!' % trainToDelete.character_name)
         session.commit()
-        return redirect(url_for('showSets', category_name=category_name))
+        return redirect(url_for('showCatalog'))
     else:
-        return render_template('deleteset.html', lego_set=lego_set)
+        return render_template('deletetrain.html', trainToDelete=trainToDelete)
 
 
 if __name__ == '__main__':

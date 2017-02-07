@@ -1,0 +1,8 @@
+{% extends "main.html" %}
+{% include "header.html" %}
+
+{% block content %}
+  <h2>{{train.character_name}}</h2>
+  <p>{{train.description}}</p>
+  <a href="{{url_for('editTrain', train_name=train.character_name)}}">Edit</a> | <a href="{{url_for('deleteTrain', train_name=train.character_name)}}">Delete</a>
+{% endblock %}

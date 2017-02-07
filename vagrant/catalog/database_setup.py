@@ -24,34 +24,31 @@ class User(Base):
         }
 
 
-class Category(Base):
-    __tablename__ = 'category'
+class CharacterType(Base):
+    __tablename__ = 'character_type'
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'))
-    category_name = Column(String(250), nullable=False)
-    age_range = Column(String(15))
+    type_name = Column(String(250), nullable=False)
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
             'id': self.id,
-            'category_name': self.category_name,
-            'age_range': self.age_range
+            'type_name': self.type_name
         }
 
 
-class LegoSet(Base):
-    __tablename__ = 'lego_set'
+class Character(Base):
+    __tablename__ = 'character'
 
-    set_name = Column(String(80), nullable=False)
+    character_name = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
-    pieces = Column(Integer)
-    set_id = Column(Integer)
     description = Column(String(250))
-    categoryName = Column(String(250), ForeignKey('category.category_name'))
-    category = relationship(Category)
+    character_picture = Column(String(250))
+    character_kind = Column(String(250), ForeignKey('character_type.type_name'))
+    character_type = relationship(CharacterType)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
@@ -60,15 +57,14 @@ class LegoSet(Base):
         """Return object data in easily serializeable format"""
         return {
             'id': self.id,
-            'set_name': self.set_name,
-            'pieces': self.pieces,
-            'set_id': self.set_id,
+            'character_name': self.character_name,
             'description': self.description,
-            'categoryName': self.categoryName
+            'character_kind': self.character_kind,
+            'character_picture': self.character_picture
         }
 
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('sqlite:///thomascatalog.db')
 
 
 Base.metadata.create_all(engine)
