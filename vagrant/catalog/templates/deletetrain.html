@@ -2,8 +2,9 @@
 {% include "header.html" %}
 
 {% block content %}
-<h2>Delete {{trainToDelete.character_name}}?</h2>
-<form action="#" method="post">
-  <input type="submit" value="Delete">
-</form>
+  <h2>Delete {{trainToDelete.character_name}}?</h2>
+  <form action="#" method="post">
+    <input type="submit" value="Delete">
+    <a href="{{url_for('showCatalog')}}">Cancel</a>
+  </form>
 {% endblock %}

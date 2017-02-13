@@ -54,9 +54,10 @@ def showCatalog():
 @app.route('/catalog/<train_type>')
 @app.route('/catalog/<train_type>/trains')
 def showTrains(train_type):
+    inventory = session.query(CharacterType).all()
     trainType = session.query(CharacterType).filter_by(type_name=train_type).one()
     trains = session.query(Character).filter_by(character_kind=train_type).all()
-    return render_template('showtrains.html', trainType=trainType, trains=trains)
+    return render_template('showtrains.html', trainType=trainType, trains=trains, inventory=inventory)
 
 
 # show info for one train
@@ -71,7 +72,7 @@ def showTrain(train_type, train_name):
 def addTrain():
     inventory = session.query(CharacterType).all()
     if request.method == 'POST':
-        newTrain = Character(character_name=request.form['character_name'], description=request.form['description'], character_kind=request.form['character_kind'])
+        newTrain = Character(character_name=request.form['character_name'], description=request.form['description'], character_kind=request.form['character_kind'], character_picture=request.form['character_picture'])
         session.add(newTrain)
         flash('%s successfully added!' % newTrain.character_name)
         session.commit()
@@ -92,6 +93,8 @@ def editTrain(train_name):
             editedTrain.description = request.form['description']
         if request.form['character_kind']:
             editedTrain.character_kind = request.form['character_kind']
+        if request.form['character_picture']:
+            editedTrain.character_picture = request.form['character_picture']
         session.add(editedTrain)
         flash('%s edited successfully!' % editedTrain.character_name)
         session.commit()

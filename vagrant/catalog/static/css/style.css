@@ -1,2 +1,15 @@
+.image-preview {
+  width: 100px;
+  height: 70px;
+}
 
+.trains-preview {
+  width: 200px;
+  height: 140px;
+}
+
+.train-picture {
+  width: 300px;
+  height: 200px;
+}
 

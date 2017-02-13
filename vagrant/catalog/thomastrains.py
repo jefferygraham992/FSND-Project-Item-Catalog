@@ -53,8 +53,8 @@ type3 = CharacterType(user_id=1, type_name="Narrow Gauge Engines")
 session.add(type3)
 session.commit()
 
-# Miscellanous Vehicles
-type4 = CharacterType(user_id=1, type_name="Miscellanous Vehicles")
+# Electric Engines
+type4 = CharacterType(user_id=1, type_name="Electric Engines")
 session.add(type4)
 session.commit()
 
@@ -70,4 +70,3 @@ for character in characters:
     print(character.description)
     print(character.character_kind)
     print("\n")
-

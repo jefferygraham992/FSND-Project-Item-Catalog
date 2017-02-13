@@ -4,18 +4,31 @@
 {% block content %}
 <h1>New Train</h1>
 <form action="#" method="post">
-  <label for="name">Name:</label>
-  <input type="text" name="character_name" placeholder="Name of train">
+  <div>
+    <label for="name">Name:</label>
+    <input type="text" name="character_name" placeholder="Name of train">
+  </div>
 
-  <label for="description">Description:</label>
-  <textarea name="description" placeholder="Description of train"></textarea>
+  <div>
+    <label for="description">Description:</label>
+    <textarea name="description" placeholder="Description of train"></textarea>
+  </div>
 
-  <label for="Category">Category:</label>
-  <select name="character_kind">
-    {% for train_kind in inventory %}
-      <option>{{train_kind.type_name}}</option>>
-    {% endfor %}
-  </select>
-  <input type="Submit" value="Submit">
+  <div>
+    <label for="picture">Picture (URL):</label>
+    <input type="text" name="character_picture" placeholder="URL for train picture">
+  </div>
+
+  <div>
+    <label for="category">Category:</label>
+    <select name="character_kind">
+      {% for train_kind in inventory %}
+        <option>{{train_kind.type_name}}</option>>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <input type="Submit" value="Submit">
+  </div>
 </form>
 {% endblock %}
