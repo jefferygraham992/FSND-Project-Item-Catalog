@@ -10,7 +10,7 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column(Integer, primary_key=True)
-    user_name = Column(String(250), nullable=False)
+    username = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
     picture = Column(String(250))
 
@@ -19,8 +19,9 @@ class User(Base):
         """Return object data in easily serializeable format"""
         return {
             'id': self.id,
-            'user_name': self.user_name,
-            'picture': self.picture
+            'username': self.username,
+            'picture': self.picture,
+            'email': self.email
         }
 
 
