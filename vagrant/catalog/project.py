@@ -34,6 +34,83 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
+@app.route('/fbconnect', methods=['POST'])
+def fbconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = request.data
+    print "access token received %s " % access_token
+
+    app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
+        'web']['app_id']
+    app_secret = json.loads(
+        open('fb_client_secrets.json', 'r').read())['web']['app_secret']
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+
+    # Use token to get user info from API
+    userinfo_url = "https://graph.facebook.com/v2.4/me"
+    # strip expire tag from access token
+    token = result.split("&")[0]
+
+
+    url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    # print "url sent for API access:%s"% url
+    # print "API JSON result: %s" % result
+    data = json.loads(result)
+    login_session['provider'] = 'facebook'
+    login_session['username'] = data["name"]
+    login_session['email'] = data["email"]
+    login_session['facebook_id'] = data["id"]
+
+    # The token must be stored in the login_session in order to properly logout, let's strip out the information before the equals sign in our token
+    stored_token = token.split("=")[1]
+    login_session['access_token'] = stored_token
+
+    # Get user picture
+    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[1]
+    data = json.loads(result)
+
+    login_session['picture'] = data["data"]["url"]
+
+    # see if user exists
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+
+    flash("Now logged in as %s" % login_session['username'])
+    return output
+
+
+@app.route('/fbdisconnect')
+def fbdisconnect():
+    facebook_id = login_session['facebook_id']
+    # The access token must me included to successfully logout
+    access_token = login_session['access_token']
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    h = httplib2.Http()
+    result = h.request(url, 'DELETE')[1]
+    return "you have been logged out"
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -83,9 +160,9 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    stored_access_token = login_session.get('access_token')
+    stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
-    if stored_access_token is not None and gplus_id == stored_gplus_id:
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
@@ -105,6 +182,14 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    # ADD PROVIDER TO LOGIN SESSION
+    login_session['provider'] = 'google'
+
+    # see if user exists, if it doesn't make a new one
+    user_id = getUserID(data["email"])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
@@ -117,36 +202,50 @@ def gconnect():
     print "done!"
     return output
 
-    # DISCONNECT - Revoke a current user's token and reset their login_session
+# User Helper Functions
+
+
+def createUser(login_session):
+    newUser = User(username=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+# DISCONNECT - Revoke a current user's token and reset their login_session
 
 
 @app.route('/gdisconnect')
 def gdisconnect():
-    access_token = login_session['access_token']
-    print 'In gdisconnect access token is %s', access_token
-    print 'User name is: '
-    print login_session['username']
-    if access_token is None:
-        print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+    # Only disconnect a connected user.
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    access_token = credentials.access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    print 'result is '
-    print result
-    if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+    if result['status'] != '200':
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -176,7 +275,10 @@ def trainJSON(train_type, train_name):
 def showCatalog():
     inventory = session.query(CharacterType).order_by(asc(CharacterType.id))
     latest_trains = session.query(Character).limit(10)
-    return render_template('showcatalog.html', inventory=inventory, latest_trains=latest_trains)
+    if 'username' not in login_session:
+        return render_template('publicshowcatalog.html', inventory=inventory, latest_trains=latest_trains)
+    else:
+        return render_template('showcatalog.html', inventory=inventory, latest_trains=latest_trains)
 
 
 # show all trains in one category
@@ -186,14 +288,21 @@ def showTrains(train_type):
     inventory = session.query(CharacterType).all()
     trainType = session.query(CharacterType).filter_by(type_name=train_type).one()
     trains = session.query(Character).filter_by(character_kind=train_type).all()
-    return render_template('showtrains.html', trainType=trainType, trains=trains, inventory=inventory)
+    if 'username' not in login_session:
+        return render_template('publicshowtrains.html', trainType=trainType, trains=trains, inventory=inventory)
+    else:
+        return render_template('showtrains.html', trainType=trainType, trains=trains, inventory=inventory)
 
 
 # show info for one train
 @app.route('/catalog/<train_type>/<train_name>')
 def showTrain(train_type, train_name):
     train = session.query(Character).filter_by(character_name=train_name).one()
-    return render_template('showtrain.html', train=train)
+    creator = getUserInfo(train.user_id)
+    if 'username' not in login_session or creator.id != login_session['user_id']:
+        return render_template('publicshowtrain.html', train=train, creator=creator)
+    else:
+        return render_template('showtrain.html', train=train, creator=creator)
 
 
 # add a train
@@ -203,7 +312,7 @@ def addTrain():
         return redirect('/login')
     inventory = session.query(CharacterType).all()
     if request.method == 'POST':
-        newTrain = Character(character_name=request.form['character_name'], description=request.form['description'], character_kind=request.form['character_kind'], character_picture=request.form['character_picture'])
+        newTrain = Character(character_name=request.form['character_name'], description=request.form['description'], character_kind=request.form['character_kind'], character_picture=request.form['character_picture'], user_id=login_session['user_id'])
         session.add(newTrain)
         flash('%s successfully added!' % newTrain.character_name)
         session.commit()
@@ -219,6 +328,8 @@ def editTrain(train_name):
         return redirect('/login')
     inventory = session.query(CharacterType).all()
     editedTrain = session.query(Character).filter_by(character_name=train_name).one()
+    if editedTrain.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to edit this train. Please create your own train in order to edit.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
         if request.form['character_name']:
             editedTrain.character_name = request.form['character_name']
@@ -242,6 +353,8 @@ def deleteTrain(train_name):
     if 'username' not in login_session:
         return redirect('/login')
     trainToDelete = session.query(Character).filter_by(character_name=train_name).one()
+    if trainToDelete.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to delete this train. Please create your own train in order to delete.');}</script><body onload='myFunction()''>"
     if request.method == 'POST':
         session.delete(trainToDelete)
         flash('%s successfuly deleted!' % trainToDelete.character_name)
@@ -249,6 +362,29 @@ def deleteTrain(train_name):
         return redirect(url_for('showCatalog'))
     else:
         return render_template('deletetrain.html', trainToDelete=trainToDelete)
+
+
+# Disconnect based on provider
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['gplus_id']
+            del login_session['access_token']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            del login_session['facebook_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+        return redirect(url_for('showCatalog'))
+    else:
+        flash("You were not logged in")
+        return redirect(url_for('showCatalog'))
 
 
 if __name__ == '__main__':

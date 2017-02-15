@@ -1,6 +1,14 @@
 <div class="container">
   <div class="row page-header">
-    <a class="col-md-6" href="{{url_for('showCatalog')}}"><button>Home</button></a>
-    <p class="col-md-6 text-right"><button>Login</button> </p>
+    <div class="col-md-6">
+      <a href="{{url_for('showCatalog')}}"><button>Home</button></a>
+    </div>
+    <div class="col-md-6 text-right">
+      {% if 'username' not in session %}
+        <a href="{{url_for('showLogin')}}">Click Here to Login</a>
+      {% else %}
+        <a href="{{url_for('disconnect')}}">Logout</a>
+      {% endif %}
+    </div>
   </div>
 </div>
