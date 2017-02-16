@@ -2,30 +2,32 @@
 {% include "header.html" %}
 
 {% block content %}
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      {% for message in messages %}
-        <li><strong>{{message}}</strong></li>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
-  <div class="col-md-4">
-    <h2>Categories</h2>
-    {% for train_kind in inventory %}
-      <a href="{{url_for('showTrains', train_type=train_kind.type_name)}}"><p>{{train_kind.type_name}}</p></a>
-    {% endfor %}
-  </div>
-
-  <div class="col-md-8">
-    <h2>Latest Trains</h2>
-    {% for latest_train in latest_trains %}
-      {% if latest_train.character_picture %}
-        <p><a href="{{url_for('showTrain', train_type=latest_train.character_kind, train_name=latest_train.character_name)}}"><img class ="image-preview img-thumbnail img-fluid" src="{{latest_train.character_picture}}">{{latest_train.character_name}}</a> ({{latest_train.character_kind}})</p>
-      {% else %}
-        <p><a href="{{url_for('showTrain', train_type=latest_train.character_kind, train_name=latest_train.character_name)}}"><img class ="image-preview img-thumbnail img-fluid" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">{{latest_train.character_name}}</a> ({{latest_train.character_kind}})</p>
+  <div class="inner-container">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <li><strong>{{message}}</strong></li>
+        {% endfor %}
       {% endif %}
-    {% endfor %}
-    <a href="{{url_for('addTrain')}}">(Add new train)</a>
+    {% endwith %}
+
+    <div class="col-md-4">
+      <h2>Categories</h2>
+      {% for train_kind in inventory %}
+        <a href="{{url_for('showTrains', train_type=train_kind.type_name)}}"><p>{{train_kind.type_name}}</p></a>
+      {% endfor %}
+    </div>
+
+    <div class="col-md-8">
+      <h2>Latest Trains</h2>
+      {% for latest_train in latest_trains %}
+        {% if latest_train.character_picture %}
+          <p><a href="{{url_for('showTrain', train_type=latest_train.character_kind, train_name=latest_train.character_name)}}"><img class ="image-preview img-thumbnail img-fluid" src="{{latest_train.character_picture}}">{{latest_train.character_name}}</a> ({{latest_train.character_kind}})</p>
+        {% else %}
+          <p><a href="{{url_for('showTrain', train_type=latest_train.character_kind, train_name=latest_train.character_name)}}"><img class ="image-preview img-thumbnail img-fluid" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">{{latest_train.character_name}}</a> ({{latest_train.character_kind}})</p>
+        {% endif %}
+      {% endfor %}
+      <a href="{{url_for('addTrain')}}">(Add new train)</a>
+    </div>
   </div>
 {% endblock %}

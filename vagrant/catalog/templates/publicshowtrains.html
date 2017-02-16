@@ -2,21 +2,23 @@
 {% include "header.html" %}
 
 {% block content %}
-  <div class="col-md-4">
-    <h2>Categories</h2>
-    {% for train_kind in inventory %}
-      <a href="{{url_for('showTrains', train_type=train_kind.type_name)}}"><p>{{train_kind.type_name}}</p></a>
-    {% endfor %}
-  </div>
+  <div class="inner-container">
+    <div class="col-md-4">
+      <h2>Categories</h2>
+      {% for train_kind in inventory %}
+        <a href="{{url_for('showTrains', train_type=train_kind.type_name)}}"><p>{{train_kind.type_name}}</p></a>
+      {% endfor %}
+    </div>
 
-  <div class="col-md-8">
-    <h2>{{trainType.type_name}}:</h2>
-    {% for train in trains %}
-      {% if train.character_picture %}
-        <h3><a href="{{url_for('showTrain', train_type=train.character_kind, train_name=train.character_name)}}"><img class ="trains-preview img-thumbnail img-fluid" src="{{train.character_picture}}">{{train.character_name}}</a></h3>
-      {% else %}
-        <h3><a href="{{url_for('showTrain', train_type=train.character_kind, train_name=train.character_name)}}"><img class ="trains-preview img-thumbnail img-fluid" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">{{train.character_name}}</a></h3>
-      {% endif %}
-    {% endfor %}
+    <div class="col-md-8">
+      <h2>{{trainType.type_name}}:</h2>
+      {% for train in trains %}
+        {% if train.character_picture %}
+          <h3><a href="{{url_for('showTrain', train_type=train.character_kind, train_name=train.character_name)}}"><img class ="trains-preview img-thumbnail img-fluid" src="{{train.character_picture}}">{{train.character_name}}</a></h3>
+        {% else %}
+          <h3><a href="{{url_for('showTrain', train_type=train.character_kind, train_name=train.character_name)}}"><img class ="trains-preview img-thumbnail img-fluid" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">{{train.character_name}}</a></h3>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}

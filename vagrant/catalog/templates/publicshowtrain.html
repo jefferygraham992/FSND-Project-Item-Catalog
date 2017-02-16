@@ -2,12 +2,14 @@
 {% include "header.html" %}
 
 {% block content %}
-  <h2>{{train.character_name}}</h2>
-  <h5>Submitted by: {{creator.username}}</h5>
-  {% if train.character_picture %}
-    <img class="train-picture" src="{{train.character_picture}}">
-  {% else %}
-    <img class="train-picture" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">
-  {% endif %}
-  <p>{{train.description}}</p>
+  <div class="inner-container">
+    <h2>{{train.character_name}}</h2>
+    <h5>Submitted by: {{creator.username}}</h5>
+    {% if train.character_picture %}
+      <img class="train-picture" src="{{train.character_picture}}">
+    {% else %}
+      <img class="train-picture" src="{{url_for('static', filename='images/sorry-image-not-available.png')}}">
+    {% endif %}
+    <p>{{train.description}}</p>
+  </div>
 {% endblock %}

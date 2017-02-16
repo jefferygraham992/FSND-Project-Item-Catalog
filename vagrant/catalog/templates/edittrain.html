@@ -2,39 +2,41 @@
 {% include "header.html" %}
 
 {% block content %}
-  <h1>Edit {{editedTrain.character_name}}</h1>
-  <form action="#" method="post">
-    <div>
-      <label for="name">Name:</label>
-      <input type="text" name="character_name" placeholder="{{editedTrain.character_name}}">
-    </div>
+  <div class="inner-container">
+    <h1>Edit {{editedTrain.character_name}}</h1>
+    <form action="#" method="post">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input class="form-control" type="text" name="character_name" placeholder="{{editedTrain.character_name}}">
+      </div>
 
-    <div>
-      <label for="description">Description:</label>
-      <textarea name="description" placeholder="{{editedTrain.description}}"></textarea>
-    </div>
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea class="form-control" name="description" placeholder="{{editedTrain.description}}"></textarea>
+      </div>
 
-    <div>
-      <label for="picture">Picture (URL):</label>
-      <input type="text" name="character_picture" placeholder="{{editedTrain.character_picture}}">
-    </div>
+      <div class="form-group">
+        <label for="picture">Picture (URL):</label>
+        <input class="form-control" type="text" name="character_picture" placeholder="{{editedTrain.character_picture}}">
+      </div>
 
-    <div>
-      <label for="Category">Category:</label>
-      <select name="character_kind">
-        {% for train_kind in inventory %}
-          {% if editedTrain %}
-            <option value="{{editedTrain.character_kind}}" selected>{{editedTrain.character_kind}}</option>>
-          {% else %}
-            <option value="{{train_kind.type_name}}">{{train_kind.type_name}}</option>>
-          {% endif %}
-        {% endfor %}
-      </select>
-    </div>
+      <div class="form-group">
+        <label for="Category">Category:</label>
+        <select class="form-control" name="character_kind">
+          {% for train_kind in inventory %}
+            {% if editedTrain %}
+              <option value="{{editedTrain.character_kind}}" selected>{{editedTrain.character_kind}}</option>>
+            {% else %}
+              <option value="{{train_kind.type_name}}">{{train_kind.type_name}}</option>>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
 
-    <div>
-      <input type="Submit" value="Submit">
-      <a href="{{url_for('showCatalog')}}">Cancel</a>
-    </div>
-  </form>
+      <div class="form-group">
+        <button class="btn btn-primary" type="Submit">Submit</button>
+        <a href="{{url_for('showCatalog')}}">Cancel</a>
+      </div>
+    </form>
+  </div>
 {% endblock %}

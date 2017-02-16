@@ -13,3 +13,20 @@
   height: 200px;
 }
 
+body {
+  background-image: url("/static/images/thomas.jpg"), url("/static/images/thomas.jpg");
+  background-position: left top, right top;
+  background-repeat: repeat-y, repeat-y;
+  background-attachment: fixed, fixed;
+}
+
+.container {
+  background-color: white;
+}
+
+.inner-container {
+  background-color: white;
+  height: 100vh;
+}
+
+
