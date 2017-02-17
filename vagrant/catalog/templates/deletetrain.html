@@ -2,14 +2,20 @@
 {% include "header.html" %}
 
 {% block content %}
-  <div class="inner-container">
-    <h2>Delete {{trainToDelete.character_name}}?</h2>
-    {% if trainToDelete.character_picture %}
-      <img class="train-picture" src="{{trainToDelete.character_picture}}">
-    {% endif %}
+  <h2>Delete {{trainToDelete.character_name}}?</h2>
+
+  {% if trainToDelete.character_picture %}
+    <div class="row">
+      <div class="col-md-12">
+        <img class="train-picture" src="{{trainToDelete.character_picture}}">
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="delete-form">
     <form action="#" method="post">
-      <input type="submit" value="Delete">
+      <button class="btn btn-primary" type="Submit">Delete</button>
       <a href="{{url_for('showCatalog')}}">Cancel</a>
-    </form>
+  </form>
   </div>
 {% endblock %}
