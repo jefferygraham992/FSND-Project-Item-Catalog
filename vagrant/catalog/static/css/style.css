@@ -16,10 +16,11 @@
 }
 
 body {
-  background-image: url("/static/images/thomas.jpg"), url("/static/images/thomas.jpg");
-  background-position: left top, right top;
-  background-repeat: repeat-y, repeat-y;
-  background-attachment: fixed, fixed;
+  background-color: #ddd;
+}
+
+.container {
+  background-color: white;
 }
 
 .divider {
@@ -37,4 +38,5 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
+
 
