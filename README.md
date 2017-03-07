@@ -37,6 +37,7 @@ These instructions will show you how to run the application locally.
   1. `$  python thomascatalog.db`
 6. Run the **thomastrains.py** file to to prepopulate the database with som items
   1. `$  python thomastrains.py`
-7. Run the **project.py** file to run the application locally
+7. Run the **project.py** file to start the server
   1. `$  python project.py`
-8. Open a web browser and visit [http://localhost:8000](http://localhost:8000)
+8. Open a web browser to run the application locally
+  1. Visit [http://localhost:8000](http://localhost:8000)

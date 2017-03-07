@@ -16,6 +16,9 @@
 }
 
 body {
+  background-image: url('/static/images/thomas.jpg'), url('/static/images/thomas.jpg');
+  background-repeat: repeat-y, repeat-y;
+  background-position: top left, top right;
   background-color: #ddd;
 }
 
