@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for
 from flask import flash
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, CharacterType, Character, User
 from flask import session as login_session
@@ -273,7 +273,7 @@ def trainJSON(train_type, train_name):
 @app.route('/catalog')
 def showCatalog():
     inventory = session.query(CharacterType).order_by(asc(CharacterType.id))
-    latest_trains = session.query(Character).limit(10)
+    latest_trains = session.query(Character).order_by(desc(Character.id)).limit(10)
     if 'username' not in login_session:
         return render_template('publicshowcatalog.html',
                                inventory=inventory,
